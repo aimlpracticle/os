@@ -1,0 +1,194 @@
+# Practical 4: Thread Synchronization and Deadlock Handling Using Semaphores
+
+## Aim:
+To implement a deadlock-free solution to the Dining Philosophers Problem using semaphores and demonstrate thread synchronization and deadlock avoidance.
+
+## 1. Introduction:
+
+Thread synchronization is a technique used to coordinate multiple threads while accessing shared resources.
+
+Deadlock is a situation in which two or more processes or threads wait for resources held by each other, and none of them can continue execution.
+
+In this practical, we implement the Dining Philosophers Problem using C programming and semaphores.
+
+The program consists of five philosophers sitting around a circular table. Each philosopher requires two chopsticks to eat. Semaphores are used to control access to chopsticks and prevent multiple philosophers from using the same chopstick simultaneously.
+
+Different philosophers pick up chopsticks in different orders to prevent circular waiting and avoid deadlock.
+
+## 2. Basic Concepts:
+
+**1. Thread:**
+A thread is the smallest unit of execution within a process. Multiple threads can perform different tasks simultaneously.
+
+**2. Thread Synchronization:**
+It is a technique used to coordinate multiple threads and manage access to shared resources safely.
+
+**3. Deadlock:**
+Deadlock is a situation in which two or more threads wait for resources held by each other, and none of them can continue execution.
+
+**4. Semaphore:**
+A semaphore is a synchronization mechanism used to control access to shared resources.
+
+**5. Deadlock Avoidance:**
+Deadlock avoidance is a technique used to prevent the system from entering a deadlocked state.
+
+**6. Starvation:**
+Starvation occurs when a thread waits for a resource for a long time because other threads continuously get access to it.
+
+**7. Dining Philosophers Problem:**
+It is a classical operating system synchronization problem in which philosophers share chopsticks and need two chopsticks to eat.
+
+## 3. Code Explanation:
+
+**1. Header Files:**
+
+- `stdio.h` – Used for input and output operations.
+- `pthread.h` – Used for creating and managing threads.
+- `semaphore.h` – Used for semaphore operations.
+- `unistd.h` – Used for the sleep() function.
+
+**2. Define Number of Philosophers:**
+
+`#define N 5`
+
+It defines the total number of philosophers as 5.
+
+**3. Semaphore Declaration:**
+
+`sem_t chopsticks[N];`
+
+It creates an array of 5 semaphores. Each semaphore represents one chopstick.
+
+**4. Philosopher Function:**
+
+`void* philosopher(void* num)`
+
+This function represents the activity of each philosopher.
+
+- It receives the philosopher ID as an argument.
+- Each philosopher performs the thinking and eating operations 3 times.
+- `sleep(1)` pauses the philosopher for one second while thinking.
+
+**5. Even and Odd Philosopher Condition:**
+
+`if (id % 2 == 0)`
+
+It checks whether the philosopher ID is even or odd.
+
+- Even-numbered philosophers pick up their own chopstick first and then the next chopstick.
+- Odd-numbered philosophers pick up the next chopstick first and then their own chopstick.
+
+This different order of acquiring chopsticks prevents circular waiting and avoids deadlock.
+
+**6. sem_wait():**
+
+`sem_wait(&chopsticks[id]);`
+
+It requests a chopstick. If the chopstick is already being used, the philosopher waits until it becomes available.
+
+**7. Eating Operation:**
+
+`printf("Philosopher %d is EATING.\n", id);`
+
+It displays that the philosopher is eating.
+
+`sleep(2);`
+
+It pauses execution for two seconds to represent the eating time.
+
+**8. sem_post():**
+
+`sem_post(&chopsticks[id]);`
+
+It releases the chopstick after eating so that another philosopher can use it.
+
+**9. Main Function:**
+
+The main() function is the starting point of the program.
+
+`pthread_t threads[N];`
+
+It creates an array to store the five thread IDs.
+
+`int phil_ids[N];`
+
+It stores the IDs of the five philosophers.
+
+**10. Initialize Semaphores:**
+
+`sem_init(&chopsticks[i], 0, 1);`
+
+It initializes each semaphore with a value of 1 because every chopstick is initially available.
+
+**11. Create Threads:**
+
+`pthread_create(&threads[i], NULL, philosopher, &phil_ids[i]);`
+
+It creates five threads. Each thread represents one philosopher and executes the philosopher() function.
+
+**12. Join Threads:**
+
+`pthread_join(threads[i], NULL);`
+
+It makes the main thread wait until all philosopher threads finish their execution.
+
+**13. Destroy Semaphores:**
+
+`sem_destroy(&chopsticks[i]);`
+
+It destroys the semaphores after all threads complete their execution.
+
+**14. Completion Message:**
+
+The program displays "Simulation completed successfully without deadlock!" after all philosophers finish their activities.
+
+## 4. Working of the Program:
+
+1. First, the program initializes five semaphores, one for each chopstick.
+2. Each semaphore is initialized with a value of 1.
+3. The program creates five philosopher threads.
+4. Each philosopher starts thinking.
+5. Each philosopher tries to acquire two chopsticks using sem_wait().
+6. Even and odd philosophers acquire chopsticks in different orders.
+7. After acquiring both chopsticks, the philosopher starts eating.
+8. After eating, the philosopher releases both chopsticks using sem_post().
+9. Each philosopher repeats the thinking and eating process three times.
+10. The main thread waits for all philosophers using pthread_join().
+11. Finally, all semaphores are destroyed and the program terminates.
+
+## 5. How Deadlock Is Avoided:
+
+In the normal Dining Philosophers Problem, if every philosopher picks up one chopstick and waits for the second chopstick, all philosophers may wait forever.
+
+This situation is called deadlock.
+
+In our program, even and odd philosophers acquire chopsticks in different orders.
+
+This breaks the circular waiting condition, which is one of the necessary conditions for deadlock.
+
+Therefore, the program prevents deadlock.
+
+## 6. Functions Used:
+
+1. `pthread_create()` – Creates a new thread.
+2. `pthread_join()` – Waits for a thread to finish.
+3. `sem_init()` – Initializes a semaphore.
+4. `sem_wait()` – Decreases the semaphore value or waits if the resource is unavailable.
+5. `sem_post()` – Increases the semaphore value and releases the resource.
+6. `sem_destroy()` – Destroys a semaphore.
+7. `sleep()` – Pauses execution for a specified time.
+8. `printf()` – Displays output.
+
+## 7. Compilation and Execution:
+
+To compile the program:
+
+`gcc dining.c -o dining -pthread`
+
+To execute the program:
+
+`./dining`
+
+## 8. Conclusion:
+
+Thus, we successfully implemented the Dining Philosophers Problem using threads and semaphores in C programming. We studied thread synchronization, resource sharing, deadlock, and deadlock avoidance by allowing philosophers to acquire chopsticks in different orders.

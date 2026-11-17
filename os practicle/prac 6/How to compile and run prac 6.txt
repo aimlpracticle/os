@@ -1,0 +1,23 @@
+How to compile and run
+Run these commands in a Linux terminal.
+
+1. Create the two FIFO pipes:
+mkfifo fifo1 fifo2
+
+
+2. Compile both programs:
+gcc process1.c -o process1
+gcc process2.c -o process2
+
+
+3. Open two terminals in the same directory.
+
+Terminal 1:
+./process2
+
+
+Terminal 2:
+./process1
+
+
+Enter a sentence in Process 1 to receive its character, word, and line counts. Type exit to terminate the processes.

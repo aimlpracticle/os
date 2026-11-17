@@ -1,0 +1,362 @@
+# Practical 8: Disk Scheduling Algorithms – SSTF, SCAN and C-LOOK (CO5)
+
+## Aim
+To implement Disk Scheduling Algorithms such as SSTF, SCAN and C-LOOK in C and calculate the total head movement for each algorithm.
+
+## Theory
+
+Disk Scheduling is a technique used by the operating system to decide the order in which disk read and write requests are processed.
+
+A disk contains several tracks or cylinders. The disk head moves to different positions to access the required data.
+
+When multiple requests are waiting, the operating system uses disk scheduling algorithms to decide which request should be served first.
+
+The main objective of disk scheduling is to reduce head movement and improve disk performance.
+
+## Important Terms
+
+1. **Disk Head:** The part of the disk system that reads and writes data.
+
+2. **Track/Cylinder:** A circular path on the disk where data is stored.
+
+3. **Head Position:** The current position of the disk head.
+
+4. **Request Sequence:** The list of disk positions requested by processes.
+
+5. **Head Movement:** The distance travelled by the disk head to serve requests.
+
+6. **Total Head Movement:** The sum of all movements made by the disk head.
+
+## Disk Scheduling Algorithms
+
+### 1. SSTF (Shortest Seek Time First)
+
+- SSTF selects the request that is closest to the current head position.
+- It serves the nearest request first.
+- After completing one request, it searches for the next nearest request.
+- It reduces head movement compared to FCFS.
+- It may cause starvation for requests that are far away.
+
+### 2. SCAN Algorithm
+
+- SCAN is also called the Elevator Algorithm.
+- The disk head moves in one direction and serves all requests on its path.
+- After reaching the end of the disk, it reverses its direction.
+- It then serves the remaining requests in the opposite direction.
+- It provides more predictable service than SSTF.
+
+### 3. C-LOOK Algorithm
+
+- C-LOOK stands for Circular LOOK.
+- The disk head moves in one direction and serves all requests in that direction.
+- After reaching the last request in that direction, it jumps to the first pending request on the other side.
+- It does not travel to the physical end of the disk unless a request is present there.
+- It then continues serving requests in the same direction.
+
+## Working of the Program
+
+1. First, the program accepts the number of disk requests from the user.
+
+2. It accepts the disk request sequence and stores it in an array.
+
+3. It accepts the initial head position and disk size.
+
+4. The program calls three functions: `SSTF()`, `SCAN()` and `CLOOK()`.
+
+5. The SSTF function selects the nearest request and calculates the total head movement.
+
+6. The SCAN function sorts the requests and serves them in the initial upward direction, reaches the end of the disk, and then reverses direction.
+
+7. The C-LOOK function sorts the requests, serves the requests in the upward direction, and then jumps to the smallest pending request.
+
+8. Finally, all three algorithms display their request sequences and total head movements.
+
+## Functions Used
+
+1. **printf()** – Displays messages, request sequences and total head movement.
+
+2. **scanf()** – Accepts the number of requests, request sequence, head position and disk size from the user.
+
+3. **abs()** – Returns the positive value of a number. It is used to calculate the distance between two head positions.
+
+4. **SSTF()** – A user-defined function that selects the nearest disk request and calculates total head movement.
+
+5. **SCAN()** – A user-defined function that moves the disk head towards the end of the disk, reverses direction and serves the remaining requests.
+
+6. **CLOOK()** – A user-defined function that serves requests in one direction and then jumps to the first pending request on the other side.
+
+## Header Files Used
+
+- `stdio.h` – Used for input and output functions.
+- `stdlib.h` – Used for the `abs()` function.
+
+## Explanation of the Code
+
+### 1. Global Variables
+
+```c
+int a[20], n;
+```
+
+- `a[20]` stores the disk request sequence.
+- `n` stores the total number of requests.
+
+### 2. SSTF Function
+
+```c
+void SSTF(int h)
+```
+
+This function implements the Shortest Seek Time First algorithm.
+
+```c
+int v[20] = {0}, t = 0, min, k = 0;
+```
+
+- `v[]` keeps track of completed requests.
+- `t` stores total head movement.
+- `min` stores the minimum distance.
+- `k` stores the index of the nearest request.
+
+```c
+if (!v[j] && abs(h - a[j]) < min)
+```
+
+Checks whether the request is not completed and is closer to the current head position than the previously selected request.
+
+```c
+v[k] = 1;
+t += abs(h - a[k]);
+h = a[k];
+```
+
+- Marks the selected request as completed.
+- Adds its movement distance to the total.
+- Updates the current head position.
+
+Finally, it displays the request sequence and total head movement.
+
+### 3. SCAN Function
+
+```c
+void SCAN(int h, int size)
+```
+
+This function implements the SCAN disk scheduling algorithm.
+
+```c
+int b[20], t = 0, i, j, x;
+```
+
+- `b[]` stores a copy of the requests.
+- `t` stores total head movement.
+- `i` and `j` are loop variables.
+- `x` is used for swapping values.
+
+```c
+b[n] = h;
+```
+
+Adds the initial head position to the copied request array so that it can be located after sorting.
+
+The nested loops sort the request positions in ascending order.
+
+```c
+for (i = 0; i <= n && b[i] != h; i++);
+```
+
+Finds the position of the initial head in the sorted array.
+
+The algorithm then:
+
+1. Serves requests greater than the initial head position.
+2. Moves to the last cylinder of the disk.
+3. Reverses direction.
+4. Serves the remaining requests.
+
+```c
+t += size - 1 - h;
+h = size - 1;
+```
+
+Calculates the movement required to reach the last cylinder of the disk.
+
+### 4. C-LOOK Function
+
+```c
+void CLOOK(int h)
+```
+
+This function implements the Circular LOOK algorithm.
+
+```c
+int b[20], t = 0, i, j, x, p = n;
+```
+
+- `b[]` stores the copied request sequence.
+- `t` stores total head movement.
+- `p` stores the index of the first request greater than or equal to the initial head position.
+
+The nested loops sort the requests in ascending order.
+
+```c
+if (b[i] >= h)
+{
+    p = i;
+    break;
+}
+```
+
+Finds the first request at or above the initial head position.
+
+The first loop serves requests from that position towards the largest request.
+
+The second loop jumps to the smallest pending request and serves the remaining requests.
+
+The total head movement is calculated and displayed.
+
+### 5. Main Function
+
+```c
+int main()
+{
+    int h, size;
+```
+
+Declares variables for the initial head position and disk size.
+
+```c
+scanf("%d", &n);
+```
+
+Accepts the number of disk requests.
+
+```c
+for (int i = 0; i < n; i++)
+    scanf("%d", &a[i]);
+```
+
+Accepts the disk request sequence.
+
+```c
+scanf("%d", &h);
+scanf("%d", &size);
+```
+
+Accepts the initial head position and disk size.
+
+```c
+SSTF(h);
+SCAN(h, size);
+CLOOK(h);
+```
+
+Calls all three disk scheduling functions.
+
+Finally, the program returns 0 and terminates.
+
+## Compilation and Execution
+
+### Step 1: Save the program
+
+Save the C program as `disk.c`.
+
+### Step 2: Compile the program
+
+```bash
+gcc disk.c -o disk
+```
+
+### Step 3: Run the program
+
+```bash
+./disk
+```
+
+### Step 4: Enter sample input
+
+```text
+Enter number of requests: 8
+Enter request sequence: 98 183 37 122 14 124 65 67
+Enter initial head position: 53
+Enter disk size: 200
+```
+
+### Expected Output
+
+```text
+SSTF: 53 -> 65 -> 67 -> 37 -> 14 -> 98 -> 122 -> 124 -> 183
+Total Head Movement = 236
+
+SCAN: 53 -> 65 -> 67 -> 98 -> 122 -> 124 -> 183 -> 199 -> 37 -> 14
+Total Head Movement = 331
+
+C-LOOK: 53 -> 65 -> 67 -> 98 -> 122 -> 124 -> 183 -> 14 -> 37
+Total Head Movement = 322
+```
+
+## Conclusion
+
+Thus, SSTF, SCAN and C-LOOK disk scheduling algorithms were successfully implemented in C. The total head movement for each algorithm was calculated and displayed. These algorithms help the operating system manage disk requests efficiently.
+
+## Viva Questions and Answers
+
+**Q1. What is Disk Scheduling?**
+
+Disk Scheduling is a technique used by the operating system to decide the order of disk requests.
+
+**Q2. What is the main purpose of Disk Scheduling?**
+
+To reduce disk head movement and improve performance.
+
+**Q3. What is SSTF?**
+
+SSTF stands for Shortest Seek Time First. It selects the request closest to the current head position.
+
+**Q4. What is SCAN?**
+
+SCAN is a disk scheduling algorithm in which the head moves in one direction, serves requests and then reverses direction.
+
+**Q5. What is another name for SCAN?**
+
+Elevator Algorithm.
+
+**Q6. What is C-LOOK?**
+
+C-LOOK is a circular disk scheduling algorithm that serves requests in one direction and then jumps to the first pending request on the other side.
+
+**Q7. What is Seek Time?**
+
+Seek Time is the time required for the disk head to move to the required track.
+
+**Q8. What is Head Movement?**
+
+It is the distance travelled by the disk head between two positions.
+
+**Q9. What is starvation in SSTF?**
+
+Starvation occurs when a request keeps waiting because nearer requests are repeatedly selected.
+
+**Q10. What is the difference between SCAN and C-LOOK?**
+
+SCAN moves to the physical end of the disk before reversing direction, while C-LOOK jumps from the last pending request to the first pending request.
+
+**Q11. What is the use of `abs()`?**
+
+It returns the absolute (positive) value of a number and helps calculate head movement.
+
+**Q12. What is the use of the `v[]` array in SSTF?**
+
+It keeps track of which disk requests have already been completed.
+
+**Q13. What is the use of the `t` variable?**
+
+It stores the total head movement.
+
+**Q14. What is the initial head position?**
+
+It is the starting position of the disk head before processing requests.
+
+**Q15. Which algorithms are implemented in this practical?**
+
+SSTF, SCAN and C-LOOK.

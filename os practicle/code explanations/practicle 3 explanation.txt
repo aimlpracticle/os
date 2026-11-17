@@ -1,0 +1,229 @@
+# Practical 3: Thread Synchronization Using Counting Semaphores and Mutex
+
+## Aim:
+To implement thread synchronization using counting semaphores and mutual exclusion using mutex by demonstrating the Producer-Consumer problem in C programming.
+
+## 1. Introduction:
+
+Thread synchronization is a technique used to coordinate multiple threads so that they can access shared resources safely without creating conflicts.
+
+In this practical, we implement the Producer-Consumer problem using threads, counting semaphores, and mutex.
+
+The producer generates items and stores them in a shared buffer, while the consumer removes items from the buffer.
+
+A mutex is used to ensure that only one thread accesses the shared buffer at a time. Counting semaphores are used to keep track of empty and filled spaces in the buffer.
+
+## 2. Basic Concepts:
+
+**1. Thread:**
+A thread is the smallest unit of execution within a process. Multiple threads can execute different tasks within the same program.
+
+**2. Thread Synchronization:**
+It is a technique used to coordinate multiple threads and prevent conflicts when accessing shared resources.
+
+**3. Producer:**
+A producer is a thread that generates data and inserts it into the buffer.
+
+**4. Consumer:**
+A consumer is a thread that removes and uses data from the buffer.
+
+**5. Buffer:**
+A buffer is a temporary storage area used to store items between the producer and consumer.
+
+**6. Mutex:**
+Mutex stands for Mutual Exclusion. It is a locking mechanism that allows only one thread at a time to access a shared resource.
+
+**7. Semaphore:**
+A semaphore is a synchronization mechanism used to control access to shared resources and manage available resources.
+
+**8. Counting Semaphore:**
+A counting semaphore maintains a count of available resources. In this program, it keeps track of empty and filled buffer slots.
+
+## 3. Code Explanation:
+
+**1. Header Files:**
+
+- `stdio.h` – Used for input and output operations.
+- `stdlib.h` – Used for generating random numbers and other standard functions.
+- `pthread.h` – Used for creating and managing threads.
+- `semaphore.h` – Used for semaphore operations.
+- `unistd.h` – Used for the sleep() function.
+- `time.h` – Used to initialize the random number generator.
+
+**2. Define Buffer Size:**
+
+`#define BUFFER_SIZE 3`
+
+It defines the maximum capacity of the buffer as 3 items.
+
+**3. Define Total Items:**
+
+`#define TOTAL_ITEMS 5`
+
+It specifies that the producer will generate 5 items and the consumer will consume 5 items.
+
+**4. Buffer Declaration:**
+
+`int buffer[BUFFER_SIZE];`
+
+It creates a shared array that stores the items produced by the producer.
+
+**5. In and Out Variables:**
+
+`int in = 0, out = 0;`
+
+- `in` represents the position where the producer inserts the next item.
+- `out` represents the position from where the consumer removes the next item.
+
+**6. Mutex and Semaphore Declaration:**
+
+`pthread_mutex_t mutex;`
+
+It declares a mutex variable to protect the shared buffer.
+
+`sem_t empty, full;`
+
+It declares two semaphores:
+- `empty` – Counts the available empty spaces.
+- `full` – Counts the available filled spaces.
+
+## 4. Producer Function:
+
+`void* producer(void* arg)`
+
+This function represents the producer thread.
+
+1. It receives the thread ID as an argument.
+2. It generates a random number using rand().
+3. `sem_wait(&empty)` checks whether an empty slot is available. If no slot is available, the producer waits.
+4. `pthread_mutex_lock(&mutex)` locks the shared buffer.
+5. The producer inserts the generated item into the buffer.
+6. The `in` variable is updated to the next position.
+7. `pthread_mutex_unlock(&mutex)` releases the lock.
+8. `sem_post(&full)` increases the count of filled slots.
+9. `sleep(1)` pauses the producer for one second.
+10. `pthread_exit(NULL)` terminates the producer thread.
+
+## 5. Consumer Function:
+
+`void* consumer(void* arg)`
+
+This function represents the consumer thread.
+
+1. It receives the thread ID as an argument.
+2. `sem_wait(&full)` checks whether an item is available in the buffer. If the buffer is empty, the consumer waits.
+3. `pthread_mutex_lock(&mutex)` locks the shared buffer.
+4. The consumer removes an item from the buffer.
+5. The `out` variable is updated to the next position.
+6. `pthread_mutex_unlock(&mutex)` releases the lock.
+7. `sem_post(&empty)` increases the count of empty spaces.
+8. `sleep(2)` pauses the consumer for two seconds.
+9. `pthread_exit(NULL)` terminates the consumer thread.
+
+## 6. Main Function:
+
+The main() function is the starting point of the program.
+
+**1. Thread Declaration:**
+
+`pthread_t prod_thread, cons_thread;`
+
+It declares two thread variables: one for the producer and one for the consumer.
+
+**2. Thread IDs:**
+
+`int p_id = 1, c_id = 1;`
+
+These variables store the IDs passed to the producer and consumer functions.
+
+**3. Random Number Initialization:**
+
+`srand(time(NULL));`
+
+It initializes the random number generator using the current time.
+
+**4. Initialize Mutex:**
+
+`pthread_mutex_init(&mutex, NULL);`
+
+It initializes the mutex before using it.
+
+**5. Initialize Semaphores:**
+
+`sem_init(&empty, 0, BUFFER_SIZE);`
+
+It initializes the empty semaphore with a value of 3 because all buffer slots are initially empty.
+
+`sem_init(&full, 0, 0);`
+
+It initializes the full semaphore with a value of 0 because the buffer is initially empty.
+
+**6. Create Threads:**
+
+`pthread_create(&prod_thread, NULL, producer, &p_id);`
+
+It creates the producer thread.
+
+`pthread_create(&cons_thread, NULL, consumer, &c_id);`
+
+It creates the consumer thread.
+
+**7. Join Threads:**
+
+`pthread_join(prod_thread, NULL);`
+
+`pthread_join(cons_thread, NULL);`
+
+These statements make the main thread wait until both producer and consumer threads finish execution.
+
+**8. Destroy Mutex and Semaphores:**
+
+- `pthread_mutex_destroy(&mutex)` destroys the mutex.
+- `sem_destroy(&empty)` destroys the empty semaphore.
+- `sem_destroy(&full)` destroys the full semaphore.
+
+**9. Display Completion Message:**
+
+The program displays "Execution completed successfully" after both threads finish.
+
+## 7. Working of the Program:
+
+1. First, the program initializes the buffer, mutex, and semaphores.
+2. The buffer has a capacity of 3 items.
+3. Initially, the empty semaphore value is 3 and the full semaphore value is 0.
+4. The program creates two threads: producer and consumer.
+5. The producer generates random numbers and inserts them into the buffer.
+6. The consumer removes numbers from the buffer.
+7. The empty and full semaphores manage the available buffer spaces.
+8. The mutex ensures that only one thread accesses the shared buffer at a time.
+9. Both threads continue their operations until 5 items are produced and consumed.
+10. Finally, the main thread waits for both threads and destroys the synchronization objects.
+
+## 8. Important Functions Used:
+
+1. `pthread_create()` – Creates a new thread.
+2. `pthread_join()` – Waits for a thread to finish.
+3. `pthread_mutex_init()` – Initializes a mutex.
+4. `pthread_mutex_lock()` – Locks the mutex.
+5. `pthread_mutex_unlock()` – Unlocks the mutex.
+6. `pthread_mutex_destroy()` – Destroys the mutex.
+7. `sem_init()` – Initializes a semaphore.
+8. `sem_wait()` – Decreases the semaphore count or waits if its value is unavailable.
+9. `sem_post()` – Increases the semaphore count.
+10. `sem_destroy()` – Destroys a semaphore.
+11. `pthread_exit()` – Terminates a thread.
+12. `sleep()` – Pauses execution for a specified time.
+
+## 9. Compilation and Execution:
+
+To compile the program:
+
+`gcc producer.c -o producer -pthread`
+
+To execute the program:
+
+`./producer`
+
+## 10. Conclusion:
+
+Thus, we successfully implemented the Producer-Consumer problem using thread synchronization, counting semaphores, and mutex in C programming. We learned how multiple threads communicate through a shared buffer and how synchronization prevents conflicts while accessing shared resources.

@@ -1,0 +1,155 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int a[20], n;
+
+void SSTF(int h)
+{
+    int v[20] = {0}, t = 0, min, k = 0;
+
+    printf("\nSSTF: %d", h);
+
+    for (int i = 0; i < n; i++)
+    {
+        min = 9999;
+
+        for (int j = 0; j < n; j++)
+        {
+            if (!v[j] && abs(h - a[j]) < min)
+            {
+                min = abs(h - a[j]);
+                k = j;
+            }
+        }
+
+        v[k] = 1;
+        t += abs(h - a[k]);
+        h = a[k];
+
+        printf(" -> %d", h);
+    }
+
+    printf("\nTotal Head Movement = %d\n", t);
+}
+
+void SCAN(int h, int size)
+{
+    int b[20], t = 0, i, j, x;
+
+    for (i = 0; i < n; i++)
+        b[i] = a[i];
+
+    b[n] = h;
+
+    for (i = 0; i <= n; i++)
+    {
+        for (j = i + 1; j <= n; j++)
+        {
+            if (b[i] > b[j])
+            {
+                x = b[i];
+                b[i] = b[j];
+                b[j] = x;
+            }
+        }
+    }
+
+    for (i = 0; i <= n && b[i] != h; i++);
+
+    printf("\nSCAN: %d", h);
+
+    for (j = i + 1; j <= n; j++)
+    {
+        t += abs(h - b[j]);
+        h = b[j];
+        printf(" -> %d", h);
+    }
+
+    if (h != size - 1)
+    {
+        t += size - 1 - h;
+        h = size - 1;
+        printf(" -> %d", h);
+    }
+
+    for (j = i - 1; j >= 0; j--)
+    {
+        t += abs(h - b[j]);
+        h = b[j];
+        printf(" -> %d", h);
+    }
+
+    printf("\nTotal Head Movement = %d\n", t);
+}
+
+void CLOOK(int h)
+{
+    int b[20], t = 0, i, j, x, p = n;
+
+    for (i = 0; i < n; i++)
+        b[i] = a[i];
+
+    for (i = 0; i < n; i++)
+    {
+        for (j = i + 1; j < n; j++)
+        {
+            if (b[i] > b[j])
+            {
+                x = b[i];
+                b[i] = b[j];
+                b[j] = x;
+            }
+        }
+    }
+
+    for (i = 0; i < n; i++)
+    {
+        if (b[i] >= h)
+        {
+            p = i;
+            break;
+        }
+    }
+
+    printf("\nC-LOOK: %d", h);
+
+    for (i = p; i < n; i++)
+    {
+        t += abs(h - b[i]);
+        h = b[i];
+        printf(" -> %d", h);
+    }
+
+    for (i = 0; i < p; i++)
+    {
+        t += abs(h - b[i]);
+        h = b[i];
+        printf(" -> %d", h);
+    }
+
+    printf("\nTotal Head Movement = %d\n", t);
+}
+
+int main()
+{
+    int h, size;
+
+    printf("Enter number of requests: ");
+    scanf("%d", &n);
+
+    printf("Enter request sequence: ");
+    for (int i = 0; i < n; i++)
+        scanf("%d", &a[i]);
+
+    printf("Enter initial head position: ");
+    scanf("%d", &h);
+
+    printf("Enter disk size: ");
+    scanf("%d", &size);
+
+    SSTF(h);
+    SCAN(h, size);
+    CLOOK(h);
+
+    return 0;
+}

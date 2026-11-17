@@ -1,0 +1,225 @@
+# Practical 7: Pipes – Full Duplex Communication Between Parent and Child Processes (CO5)
+
+## Aim
+To implement full-duplex communication between parent and child processes using two pipes, where the parent sends a file pathname to the child and the child reads the file contents and sends them back to the parent.
+
+## Theory
+IPC stands for Interprocess Communication. It allows two or more processes to exchange information.
+
+A **Pipe** is a communication method used to transfer data between processes. It is generally used between related processes, such as a parent and child process.
+
+In this practical, two pipes are used for full-duplex communication:
+
+- **Pipe 1:** Parent sends the file pathname to the child process.
+- **Pipe 2:** Child sends the file contents back to the parent process.
+
+Full-duplex communication means data can travel in both directions.
+
+## Working of the Program
+
+### Parent Process
+1. Creates two pipes using `pipe()`.
+2. Creates a child process using `fork()`.
+3. Closes the unused reading end of Pipe 1 and writing end of Pipe 2.
+4. Accepts the file pathname from the user using `fgets()`.
+5. Sends the pathname to the child process using `write()`.
+6. Waits for the child process to finish using `wait()`.
+7. Reads the file contents received through Pipe 2 using `read()`.
+8. Displays the file contents on the screen using `printf()`.
+
+### Child Process
+1. Closes the unused writing end of Pipe 1 and reading end of Pipe 2.
+2. Receives the file pathname from the parent using `read()`.
+3. Opens the file in read-only mode using `open()`.
+4. Reads the file contents using `read()`.
+5. Sends the file contents to the parent process using `write()`.
+6. Closes the file and pipe ends.
+7. Terminates using `exit()`.
+
+## Functions Used
+
+1. **pipe()** – Creates a pipe for communication between processes. It provides one reading end and one writing end.
+
+2. **fork()** – Creates a new child process from the parent process.
+
+3. **read()** – Reads data from a pipe or file.
+
+4. **write()** – Sends data into a pipe.
+
+5. **close()** – Closes a file or pipe descriptor when it is no longer needed.
+
+6. **open()** – Opens a file. In this program, it opens the given file in read-only mode.
+
+7. **fgets()** – Accepts the file pathname from the user.
+
+8. **printf()** – Displays messages and file contents on the screen.
+
+9. **perror()** – Displays an error message if an operation fails.
+
+10. **strlen()** – Calculates the length of a string.
+
+11. **strcspn()** – Finds the position of the newline character so that it can be removed from the pathname.
+
+12. **wait()** – Makes the parent process wait for the child process to finish.
+
+13. **exit()** – Terminates the child process.
+
+## Important Header Files
+
+- `stdio.h` – Used for input and output functions.
+- `stdlib.h` – Used for general functions such as `exit()`.
+- `unistd.h` – Provides `pipe()`, `fork()`, `read()` and `write()`.
+- `string.h` – Used for string operations.
+- `fcntl.h` – Provides file opening options such as `O_RDONLY`.
+- `sys/wait.h` – Provides the `wait()` function.
+
+## Explanation of the Program
+
+1. First, two integer arrays `pipe1[2]` and `pipe2[2]` are declared.
+
+2. The `pipe()` function creates two pipes. Each pipe has two ends:
+   - Index 0 represents the reading end.
+   - Index 1 represents the writing end.
+
+3. The `fork()` function creates a child process.
+
+4. The program checks the return value of `fork()`:
+   - Negative value: Process creation failed.
+   - Zero: Child process.
+   - Positive value: Parent process.
+
+5. In the parent process, the unused pipe ends are closed. It accepts the file pathname and sends it through Pipe 1.
+
+6. In the child process, the pathname is received through Pipe 1.
+
+7. The child opens the file using `open()` with `O_RDONLY` mode.
+
+8. If the file cannot be opened, an error message is sent to the parent through Pipe 2.
+
+9. If the file opens successfully, the child reads its contents and sends them through Pipe 2.
+
+10. The parent reads the received file contents and displays them on the screen.
+
+11. Finally, both processes close their unused resources and complete execution.
+
+## Pipe Structure
+
+Pipe 1: Parent → Child (File Pathname)
+
+Pipe 2: Child → Parent (File Contents)
+
+## Steps to Compile and Execute
+
+### Step 1: Save the program
+
+Save the C program as:
+
+`pipe.c`
+
+### Step 2: Create a sample text file
+
+Create a file named `sample.txt` on the Desktop and write some content in it.
+
+Example content:
+
+```text
+Hello, this is a sample file.
+This file is used for IPC practical.
+We are learning pipes in Operating Systems.
+```
+
+### Step 3: Open the terminal
+
+Navigate to the Desktop directory where `sample.txt` and `pipe.c` are saved.
+
+```bash
+cd ~/Desktop
+```
+
+### Step 4: Compile the program
+
+```bash
+gcc pipe.c -o pipe
+```
+
+### Step 5: Run the program
+
+```bash
+./pipe
+```
+
+### Step 6: Enter the file pathname
+
+```text
+Enter file pathname: sample.txt
+```
+
+### Expected Output
+
+```text
+Enter file pathname: sample.txt
+
+--- File Content ---
+Hello, this is a sample file.
+This file is used for IPC practical.
+We are learning pipes in Operating Systems.
+
+--------------------
+```
+
+## Conclusion
+Thus, full-duplex communication between parent and child processes was successfully implemented using two pipes. The parent process sends the file pathname to the child, and the child reads the file contents and sends them back to the parent for display.
+
+## Viva Questions and Answers
+
+**Q1. What is a pipe?**
+
+A pipe is a method of communication used to transfer data between processes.
+
+**Q2. What is IPC?**
+
+IPC stands for Interprocess Communication. It allows processes to exchange information.
+
+**Q3. What is a full-duplex communication?**
+
+It is a communication method in which data can travel in both directions.
+
+**Q4. Why are two pipes used in this program?**
+
+One pipe sends the file pathname from parent to child, and the second pipe sends file contents from child to parent.
+
+**Q5. What is the use of `pipe()`?**
+
+It creates a pipe with a reading end and a writing end.
+
+**Q6. What is the use of `fork()`?**
+
+It creates a new child process.
+
+**Q7. What does `pipe1[0]` represent?**
+
+It represents the reading end of the first pipe.
+
+**Q8. What does `pipe1[1]` represent?**
+
+It represents the writing end of the first pipe.
+
+**Q9. What is the use of `wait()`?**
+
+It makes the parent process wait for the child process to finish.
+
+**Q10. What is the use of `O_RDONLY`?**
+
+It opens a file in read-only mode.
+
+**Q11. What is the difference between a pipe and a FIFO?**
+
+An ordinary pipe is generally used between related processes, while a FIFO is a named pipe that can be used by independent processes.
+
+**Q12. What is the difference between parent and child processes?**
+
+A parent process creates another process using `fork()`. The newly created process is called the child process.
+
+**Q13. What happens if the file does not exist?**
+
+The child cannot open the file and sends an error message to the parent through the second pipe.

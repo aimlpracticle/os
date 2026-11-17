@@ -1,0 +1,59 @@
+# Practical 5: Deadlock Avoidance – Banker's Algorithm (CO4)
+
+## Aim
+To implement the Banker's Algorithm in C to check whether the system is in a safe state or an unsafe state.
+
+## Theory
+Banker's Algorithm is a deadlock avoidance algorithm used by operating systems. It checks whether allocating resources to processes will keep the system in a safe state.
+
+A system is in a safe state if there is at least one sequence in which all processes can complete their execution without causing deadlock.
+
+The algorithm uses Allocation, Max, Need and Available matrices to determine the safe sequence.
+
+## Important Formula
+
+Need Matrix = Max Matrix - Allocation Matrix
+
+## Explanation of the Program
+
+1. First, the program accepts the number of processes and resource types from the user.
+
+2. It accepts the Allocation Matrix, which represents the resources currently allocated to each process.
+
+3. It accepts the Max Matrix, which represents the maximum resources required by each process.
+
+4. It accepts the Available resources, which represent the resources currently available in the system.
+
+5. It calculates the Need Matrix using the formula:
+
+   Need = Max - Allocation
+
+6. It initializes the Finish array to false for all processes because no process has completed yet.
+
+7. It copies the Available resources into the Work array.
+
+8. The Safety Algorithm checks whether the remaining resource requirement of any unfinished process is less than or equal to the available Work resources.
+
+9. If a process can complete, its allocated resources are added back to Work, and its Finish value becomes true.
+
+10. The process number is stored in the Safe Sequence.
+
+11. This process continues until all processes are completed or no process can be selected.
+
+12. If all processes complete, the system is in a SAFE state. Otherwise, the system is in an UNSAFE state.
+
+## Output
+If a safe sequence exists, the program displays:
+
+System is in a SAFE state.
+
+Safe Sequence: < P1 -> P3 -> P0 ... >
+
+If no safe sequence exists, it displays:
+
+System is in an UNSAFE state.
+
+No safe sequence exists.
+
+## Conclusion
+Thus, the Banker's Algorithm was successfully implemented in C to check the safe state of a system and find a safe sequence of processes. It helps in avoiding deadlocks by checking resource allocation before allowing processes to proceed.

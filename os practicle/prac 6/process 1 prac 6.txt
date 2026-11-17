@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
+
+#define BUFFER_SIZE 1024
+
+int main()
+{
+    int fd_write, fd_read;
+    char *fifo1 = "fifo1";
+    char *fifo2 = "fifo2";
+    char input_buffer[BUFFER_SIZE];
+    char output_buffer[BUFFER_SIZE];
+
+    printf("--- Process 1 Started ---\n");
+
+    while (1)
+    {
+        printf("\nEnter a sentence (or type 'exit' to quit):\n> ");
+
+        if (fgets(input_buffer, BUFFER_SIZE, stdin) == NULL)
+            break;
+
+        input_buffer[strcspn(input_buffer, "\n")] = '\0';
+
+        if (strcmp(input_buffer, "exit") == 0)
+        {
+            fd_write = open(fifo1, O_WRONLY);
+            write(fd_write, input_buffer, strlen(input_buffer) + 1);
+            close(fd_write);
+            break;
+        }
+
+        fd_write = open(fifo1, O_WRONLY);
+
+        if (fd_write < 0)
+        {
+            perror("Error opening fifo1");
+            exit(1);
+        }
+
+        write(fd_write, input_buffer, strlen(input_buffer) + 1);
+        close(fd_write);
+
+        fd_read = open(fifo2, O_RDONLY);
+
+        if (fd_read < 0)
+        {
+            perror("Error opening fifo2");
+            exit(1);
+        }
+
+        printf("\n[Process 1] Analysis Report:\n");
+
+        int bytes_read;
+
+        while ((bytes_read = read(fd_read, output_buffer,
+                                  BUFFER_SIZE - 1)) > 0)
+        {
+            output_buffer[bytes_read] = '\0';
+            printf("%s", output_buffer);
+        }
+
+        close(fd_read);
+    }
+
+    printf("Process 1 terminating.\n");
+
+    return 0;
+}

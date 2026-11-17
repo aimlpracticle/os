@@ -1,0 +1,126 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <ctype.h>
+
+#define BUFFER_SIZE 1024
+
+void analyze_text(const char *text, int *chars,
+                  int *words, int *lines)
+{
+    int i = 0;
+    int in_word = 0;
+
+    *chars = 0;
+    *words = 0;
+    *lines = 0;
+
+    if (strlen(text) > 0)
+        *lines = 1;
+
+    while (text[i] != '\0')
+    {
+        (*chars)++;
+
+        if (text[i] == '\n')
+            (*lines)++;
+
+        if (isspace((unsigned char)text[i]))
+        {
+            in_word = 0;
+        }
+        else if (!in_word)
+        {
+            in_word = 1;
+            (*words)++;
+        }
+
+        i++;
+    }
+}
+
+int main()
+{
+    int fd_read, fd_write;
+    char *fifo1 = "fifo1";
+    char *fifo2 = "fifo2";
+    char input_buffer[BUFFER_SIZE];
+    char file_buffer[BUFFER_SIZE];
+
+    printf("--- Process 2 Started ---\n");
+
+    while (1)
+    {
+        fd_read = open(fifo1, O_RDONLY);
+
+        if (fd_read < 0)
+        {
+            perror("Error opening fifo1");
+            exit(1);
+        }
+
+        int bytes_read = read(fd_read, input_buffer,
+                              BUFFER_SIZE - 1);
+        close(fd_read);
+
+        if (bytes_read <= 0)
+            continue;
+
+        input_buffer[bytes_read] = '\0';
+
+        if (strcmp(input_buffer, "exit") == 0)
+            break;
+
+        int chars = 0, words = 0, lines = 0;
+
+        analyze_text(input_buffer, &chars, &words, &lines);
+
+        FILE *file_ptr = fopen("report.txt", "w");
+
+        if (file_ptr == NULL)
+        {
+            perror("Error opening report.txt");
+            exit(1);
+        }
+
+        fprintf(file_ptr, "-------------------------\n");
+        fprintf(file_ptr, "Original Text: %s\n", input_buffer);
+        fprintf(file_ptr, "Total Characters: %d\n", chars);
+        fprintf(file_ptr, "Total Words     : %d\n", words);
+        fprintf(file_ptr, "Total Lines     : %d\n", lines);
+        fprintf(file_ptr, "-------------------------\n");
+
+        fclose(file_ptr);
+
+        fd_write = open(fifo2, O_WRONLY);
+
+        if (fd_write < 0)
+        {
+            perror("Error opening fifo2");
+            exit(1);
+        }
+
+        file_ptr = fopen("report.txt", "r");
+
+        if (file_ptr != NULL)
+        {
+            while (fgets(file_buffer, BUFFER_SIZE,
+                         file_ptr) != NULL)
+            {
+                write(fd_write, file_buffer,
+                      strlen(file_buffer));
+            }
+
+            fclose(file_ptr);
+        }
+
+        close(fd_write);
+    }
+
+    printf("Process 2 terminating.\n");
+
+    return 0;
+}

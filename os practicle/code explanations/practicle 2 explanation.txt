@@ -1,0 +1,205 @@
+# Practical 2: Process Management Using FORK and WAIT System Calls
+
+## Aim:
+To implement a C program to demonstrate FORK and WAIT system calls along with Zombie and Orphan process states.
+
+## 1. Introduction:
+
+Process management is an important function of an operating system. A process is a program that is currently running.
+
+In Linux, one process can create another process. The process that creates another process is called the Parent Process, and the newly created process is called the Child Process.
+
+For example, when a browser creates separate processes to handle different tasks, these processes work together under the operating system.
+
+In this practical, we create a parent and child process using the fork() system call. Both processes sort the same set of integers using different sorting algorithms.
+
+The parent process uses Bubble Sort, and the child process uses Selection Sort. We also use the wait() system call to make the parent wait for the child process.
+
+## 2. Basic Concepts:
+
+**1. Process:**
+A process is a program that is currently in execution.
+
+**2. Parent Process:**
+A parent process is a process that creates another process.
+
+**3. Child Process:**
+A child process is a new process created by the parent process using the fork() system call.
+
+**4. FORK System Call:**
+The fork() system call is used to create a new child process from an existing process.
+
+**5. WAIT System Call:**
+The wait() system call makes the parent process wait until its child process terminates.
+
+**6. PID:**
+PID stands for Process ID. It is a unique identification number assigned to every process.
+
+**7. Zombie Process:**
+A zombie process is a process that has completed execution, but its parent has not collected its exit status using wait().
+
+**8. Orphan Process:**
+An orphan process is a child process whose parent terminates before the child process finishes execution.
+
+## 3. Code Explanation:
+
+**1. Header Files:**
+
+- `stdio.h` – Used for input and output operations.
+- `stdlib.h` – Used for functions like exit().
+- `unistd.h` – Used for system calls like fork(), sleep(), getpid(), and getppid().
+- `sys/types.h` – Used for process-related data types like pid_t.
+- `sys/wait.h` – Used for the wait() system call.
+
+**2. Define Maximum Size:**
+
+`#define MAX 100`
+
+It defines the maximum number of integers that can be stored in the array.
+
+**3. Bubble Sort Function:**
+
+The bubble_sort() function is used by the parent process to sort the integers. It compares adjacent elements and swaps them if they are in the wrong order.
+
+**4. Selection Sort Function:**
+
+The selection_sort() function is used by the child process. It finds the smallest element and places it in the correct position.
+
+**5. Print Array Function:**
+
+The print_array() function displays all the elements of the array after sorting.
+
+**6. Main Function:**
+
+The main() function is the starting point of the program. It accepts the number of integers and their values from the user.
+
+**7. Array Declaration:**
+
+`int arr[MAX], child_arr[MAX], parent_arr[MAX];`
+
+Three arrays are created:
+- arr – Stores the original integers.
+- child_arr – Stores integers for the child process.
+- parent_arr – Stores integers for the parent process.
+
+**8. User Choice:**
+
+The program displays three options:
+- Normal Execution
+- Demonstrate Zombie Process
+- Demonstrate Orphan Process
+
+The user selects the required execution mode.
+
+**9. FORK System Call:**
+
+`pid_t pid = fork();`
+
+This statement creates a new child process.
+
+The fork() function returns:
+- Negative value – Process creation failed.
+- Zero – The current process is the child process.
+- Positive value – The current process is the parent process, and the value represents the child's PID.
+
+**10. Child Process:**
+
+`else if (pid == 0)`
+
+This condition identifies the child process.
+
+The child process displays its PID and parent PID using getpid() and getppid().
+
+It sorts the integers using Selection Sort and displays the sorted array.
+
+**11. Parent Process:**
+
+`else`
+
+This part is executed by the parent process.
+
+The parent displays its PID and child PID.
+
+It sorts the integers using Bubble Sort and displays the sorted array.
+
+**12. WAIT System Call:**
+
+`wait(NULL);`
+
+It makes the parent process wait until the child process terminates. It also collects the child's exit status.
+
+**13. Sleep Function:**
+
+`sleep(5);`
+
+It pauses the execution of a process for 5 seconds. It is used to help demonstrate process states.
+
+**14. Exit Function:**
+
+`exit(0);`
+
+It terminates the current process successfully.
+
+## 4. Working of the Program:
+
+1. First, the program accepts the number of integers from the user.
+2. The user enters the integers that need to be sorted.
+3. The program creates three arrays and copies the original values.
+4. The user selects Normal, Zombie, or Orphan execution.
+5. The fork() system call creates a child process.
+6. The parent process sorts the integers using Bubble Sort.
+7. The child process sorts the integers using Selection Sort.
+8. In Normal Execution, the parent uses wait() to wait for the child.
+9. In Zombie Demonstration, the parent delays calling wait() after the child exits.
+10. In Orphan Demonstration, the parent exits before the child finishes.
+
+## 5. Explanation of Three Execution Modes:
+
+**1. Normal Execution:**
+
+- Parent and child processes execute independently.
+- Parent sorts using Bubble Sort.
+- Child sorts using Selection Sort.
+- Parent waits for the child using wait().
+- Both processes complete their execution normally.
+
+**2. Zombie Process:**
+
+- Parent creates a child process using fork().
+- Child sorts the integers and terminates.
+- Parent does not immediately call wait().
+- The child temporarily enters the zombie state.
+- Parent later calls wait() to collect the child's exit status.
+
+**3. Orphan Process:**
+
+- Parent creates a child process using fork().
+- Parent exits immediately.
+- Child continues its execution.
+- The operating system adopts the child process.
+- The child displays its new parent PID using getppid().
+
+## 6. System Calls and Commands Used:
+
+1. fork() – Creates a child process.
+2. wait() – Makes the parent wait for the child.
+3. getpid() – Returns the current process ID.
+4. getppid() – Returns the parent process ID.
+5. sleep() – Pauses process execution.
+6. exit() – Terminates the process.
+7. printf() – Displays output.
+8. scanf() – Accepts input.
+
+## 7. Compilation and Execution:
+
+To compile the C program:
+
+`gcc process.c -o process`
+
+To execute the program:
+
+`./process`
+
+## 8. Conclusion:
+
+Thus, we successfully implemented a C program to demonstrate process management using FORK and WAIT system calls. We studied parent and child processes, performed sorting using Bubble Sort and Selection Sort, and demonstrated Zombie and Orphan process states.

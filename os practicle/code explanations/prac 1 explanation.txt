@@ -1,0 +1,69 @@
+# Practical: Address Book Management System Using Shell Scripting
+
+## Aim:
+To write a Shell Script to create and manage an Address Book using Linux commands.
+
+## Explanation:
+
+1. `#!/bin/bash` – It specifies that the program will run using the Bash shell.
+
+2. `BOOK="address_book.txt"` – It creates a variable BOOK to store the name of the address book file.
+
+3. `while true` – It creates an infinite loop so that the menu is displayed repeatedly until the user exits.
+
+4. `echo` – It is used to display the menu and messages on the screen.
+
+5. `read` – It is used to accept input from the user, such as name, phone number, email, and choice.
+
+6. `case` – It is used to execute different operations according to the user's choice.
+
+## Functions of the Address Book:
+
+**1. Create Address Book:**
+- Creates an empty file named `address_book.txt`.
+- The `>` operator creates or clears the file.
+
+**2. View Address Book:**
+- Displays all the contact records stored in the file.
+- The `cat` command is used to display the contents of the file.
+
+**3. Insert a Record:**
+- Accepts the name, phone number, and email address from the user.
+- The `echo` command with `>>` stores the new record in the file.
+- The `|` symbol separates the contact details.
+
+**4. Delete a Record:**
+- Accepts the name of the contact to be deleted.
+- The `grep` command searches for the entered name.
+- The `-i` option ignores uppercase and lowercase differences.
+- The `-v` option displays lines that do not match the search.
+- The remaining records are stored in a temporary file named `temp.txt`.
+- The `mv` command replaces the original file with the updated file.
+
+**5. Modify a Record:**
+- Searches for the contact using the entered name.
+- Deletes the old record and accepts the new phone number and email address.
+- Inserts the updated record into the address book.
+
+**6. Exit:**
+- Terminates the program using the `exit` command.
+
+## Linux Commands Used:
+
+1. `echo` – Displays messages.
+2. `read` – Accepts user input.
+3. `cat` – Displays file contents.
+4. `grep` – Searches for records.
+5. `mv` – Moves or renames files.
+6. `if` – Checks conditions.
+7. `while` – Repeats statements.
+8. `case` – Performs operations based on user choice.
+9. `exit` – Terminates the program.
+
+## Working of the Practical:
+
+In this practical, we create a menu-driven Address Book Management System using Bash Shell Scripting. The user can create an address book, view saved contacts, insert new contacts, delete existing contacts, and modify contact details. All contact information is stored in a text file named `address_book.txt`.
+
+## Conclusion:
+
+Thus, we successfully implemented an Address Book Management System using Shell Scripting. We learned about file handling, loops, conditional statements, and Linux commands to manage contact records.

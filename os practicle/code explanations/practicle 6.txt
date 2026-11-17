@@ -1,0 +1,262 @@
+# Practical: Interprocess Communication using FIFOs (CO5)
+
+## Aim
+To implement full-duplex communication between two independent processes using FIFOs (Named Pipes), where Process 1 sends sentences to Process 2 and receives the character, word and line count report.
+
+## Theory
+IPC stands for Interprocess Communication. It is a method that allows two or more independent processes to communicate and exchange information.
+
+FIFO stands for First In First Out. It is also known as a Named Pipe. It is used to transfer data between independent processes.
+
+In this practical, two FIFOs are used:
+
+- **fifo1:** Sends sentences from Process 1 to Process 2.
+- **fifo2:** Sends the analysis report from Process 2 to Process 1.
+
+This is called full-duplex communication because data is transferred in both directions.
+
+## Working of the Program
+
+### Process 1
+1. Process 1 starts and asks the user to enter a sentence.
+2. It accepts the sentence using `fgets()`.
+3. It removes the newline character using `strcspn()`.
+4. It opens fifo1 in write mode.
+5. It sends the sentence to Process 2 using `write()`.
+6. It opens fifo2 in read mode.
+7. It receives the report using `read()`.
+8. It displays the report on the screen using `printf()`.
+9. If the user enters "exit", it sends the exit message and terminates.
+
+### Process 2
+1. Process 2 starts and opens fifo1 in read mode.
+2. It receives the sentence using `read()`.
+3. It checks whether the received message is "exit".
+4. It calls the `analyze_text()` function to count characters, words and lines.
+5. It creates or opens the file `report.txt`.
+6. It stores the original sentence and its character, word and line counts in the file using `fprintf()`.
+7. It opens fifo2 in write mode.
+8. It reads the report file line by line using `fgets()`.
+9. It sends the report to Process 1 using `write()`.
+10. It repeats the process until it receives "exit".
+
+## Functions Used
+
+1. **fgets()** – Accepts a sentence from the user and stores it in a character array.
+
+2. **printf()** – Displays messages, instructions and the final report on the screen.
+
+3. **strcmp()** – Compares two strings. It is used to check whether the user has entered "exit".
+
+4. **strcspn()** – Finds the position of the newline character (`\n`) so that it can be removed from the input.
+
+5. **open()** – Opens a FIFO for reading or writing.
+
+6. **read()** – Reads data from a FIFO into a character array.
+
+7. **write()** – Sends the sentence or report through a FIFO.
+
+8. **close()** – Closes the FIFO after reading or writing is completed.
+
+9. **fopen()** – Opens the `report.txt` file for reading or writing.
+
+10. **fprintf()** – Writes the sentence and its character, word and line counts into the report file.
+
+11. **fclose()** – Closes the report file after completing file operations.
+
+12. **strlen()** – Calculates the length of a string.
+
+13. **isspace()** – Checks whether a character is a space, tab or newline. It helps in counting words.
+
+14. **exit()** – Stops the program when an error occurs.
+
+15. **perror()** – Displays an error message when a FIFO or file operation fails.
+
+16. **analyze_text()** – A user-defined function that counts the total characters, words and lines in the given sentence.
+
+## Important Header Files
+
+- `stdio.h` – Used for input/output and file operations.
+- `stdlib.h` – Used for the `exit()` function.
+- `string.h` – Used for string operations.
+- `fcntl.h` – Provides file opening options like `O_RDONLY` and `O_WRONLY`.
+- `unistd.h` – Provides `read()`, `write()` and `close()`.
+- `sys/stat.h` – Provides definitions used for FIFO operations.
+- `ctype.h` – Provides the `isspace()` function.
+
+## Explanation of Process 1 Code
+
+1. The program declares two FIFO names, `fifo1` and `fifo2`, and two character arrays to store input and output.
+
+2. It uses `fgets()` to accept a sentence from the user.
+
+3. It uses `strcspn()` to remove the newline character from the sentence.
+
+4. It uses `strcmp()` to check whether the entered sentence is "exit".
+
+5. It opens fifo1 using `open()` with `O_WRONLY` mode to send the sentence.
+
+6. It uses `write()` to transfer the sentence to Process 2.
+
+7. It opens fifo2 using `open()` with `O_RDONLY` mode to receive the report.
+
+8. It uses `read()` to receive the report and `printf()` to display it.
+
+9. If the user enters "exit", Process 1 sends the exit message and terminates.
+
+## Explanation of Process 2 Code
+
+1. The program declares two FIFO names and character arrays to store the received sentence and report.
+
+2. It opens fifo1 in read mode and receives the sentence from Process 1 using `read()`.
+
+3. It checks whether the received message is "exit". If yes, it terminates.
+
+4. It calls the `analyze_text()` function to calculate characters, words and lines.
+
+5. Inside `analyze_text()`, the character count is increased for every character.
+
+6. The word count is increased whenever a new word begins after whitespace.
+
+7. The line count is initialized to 1 for a non-empty sentence and increased whenever a newline character is found.
+
+8. It opens `report.txt` using `fopen()` in write mode.
+
+9. It uses `fprintf()` to store the original sentence and calculated counts in the file.
+
+10. It opens fifo2 in write mode and reads the report file line by line.
+
+11. It sends the report to Process 1 using `write()`.
+
+12. The process continues until it receives the exit message.
+
+## Compilation and Execution
+
+**Step 1: Save the programs**
+
+- Save the first program as `process1.c`.
+- Save the second program as `process2.c`.
+
+**Step 2: Compile both programs**
+
+```bash
+gcc process1.c -o process1
+gcc process2.c -o process2
+```
+
+**Step 3: Create two FIFOs**
+
+```bash
+mkfifo fifo1 fifo2
+```
+
+**Step 4: Open two terminals in the same directory.**
+
+In Terminal 1, run:
+
+```bash
+./process1
+```
+
+In Terminal 2, run:
+
+```bash
+./process2
+```
+
+**Step 5: Enter a sentence in Terminal 1.**
+
+Example:
+
+```text
+Enter a sentence:
+> Hello World
+```
+
+**Output displayed by Process 1:**
+
+```text
+[Process 1] Analysis Report:
+
+-------------------------
+Original Text: Hello World
+Total Characters: 11
+Total Words     : 2
+Total Lines     : 1
+-------------------------
+```
+
+The same report is saved in `report.txt`.
+
+To stop the programs, enter:
+
+```text
+exit
+```
+
+in Terminal 1.
+
+## Conclusion
+Thus, full-duplex communication between two independent processes was successfully implemented using FIFOs (Named Pipes). Process 1 sends sentences to Process 2, and Process 2 counts the characters, words and lines, stores the result in a text file and sends the report back to Process 1.
+
+## Viva Questions and Answers
+
+**Q1. What is IPC?**
+
+IPC stands for Interprocess Communication. It allows two or more processes to exchange information.
+
+**Q2. What is FIFO?**
+
+FIFO stands for First In First Out. It is a named pipe used for communication between independent processes.
+
+**Q3. What is a named pipe?**
+
+A named pipe is a special file that allows independent processes to communicate.
+
+**Q4. What is full-duplex communication?**
+
+It is communication in which data can travel in both directions.
+
+**Q5. Why are two FIFOs used in this practical?**
+
+One FIFO sends sentences from Process 1 to Process 2, and the other sends the report back from Process 2 to Process 1.
+
+**Q6. What is the use of `mkfifo()`?**
+
+It creates a named FIFO. In this practical, we use the `mkfifo` terminal command to create the FIFOs.
+
+**Q7. What is the use of `read()`?**
+
+It reads data from a FIFO or file descriptor.
+
+**Q8. What is the use of `write()`?**
+
+It sends data through a FIFO or file descriptor.
+
+**Q9. What is the use of `isspace()`?**
+
+It checks whether a character is whitespace, such as a space, tab or newline.
+
+**Q10. Where is the output report stored?**
+
+The output report is stored in a file named `report.txt`.
+
+**Q11. What is the difference between a pipe and a FIFO?**
+
+An ordinary pipe is generally used between related processes, while a FIFO has a name and can be used by independent processes.
+
+**Q12. What does full-duplex mean in this practical?**
+
+Process 1 sends sentences to Process 2, and Process 2 sends the analysis report back to Process 1.
+
+**Q13. What is the use of `O_RDONLY`?**
+
+It opens a FIFO in read-only mode.
+
+**Q14. What is the use of `O_WRONLY`?**
+
+It opens a FIFO in write-only mode.
+
+**Q15. What is the use of `report.txt`?**
+
+It stores the original sentence and the total number of characters, words and lines.

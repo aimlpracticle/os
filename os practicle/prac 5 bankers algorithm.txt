@@ -1,0 +1,122 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+int main()
+{
+    int num_processes, num_resources;
+
+    printf("=== Banker's Algorithm ===\n");
+
+    printf("Enter number of processes: ");
+    scanf("%d", &num_processes);
+
+    printf("Enter number of resource types: ");
+    scanf("%d", &num_resources);
+
+    int alloc[num_processes][num_resources];
+    int max[num_processes][num_resources];
+    int need[num_processes][num_resources];
+    int avail[num_resources];
+
+    printf("\nEnter Allocation Matrix:\n");
+    for (int i = 0; i < num_processes; i++)
+    {
+        printf("Process P%d: ", i);
+        for (int j = 0; j < num_resources; j++)
+            scanf("%d", &alloc[i][j]);
+    }
+
+    printf("\nEnter Max Matrix:\n");
+    for (int i = 0; i < num_processes; i++)
+    {
+        printf("Process P%d: ", i);
+        for (int j = 0; j < num_resources; j++)
+            scanf("%d", &max[i][j]);
+    }
+
+    printf("\nEnter Available Resources:\n");
+    for (int i = 0; i < num_resources; i++)
+    {
+        printf("Resource %c: ", 'A' + i);
+        scanf("%d", &avail[i]);
+    }
+
+    // Calculate Need Matrix
+    printf("\nNeed Matrix:\n");
+    for (int i = 0; i < num_processes; i++)
+    {
+        printf("P%d: ", i);
+        for (int j = 0; j < num_resources; j++)
+        {
+            need[i][j] = max[i][j] - alloc[i][j];
+            printf("%d ", need[i][j]);
+        }
+        printf("\n");
+    }
+
+    bool finish[num_processes];
+    int safe_seq[num_processes];
+    int work[num_resources];
+    int count = 0;
+
+    for (int i = 0; i < num_processes; i++)
+        finish[i] = false;
+
+    for (int i = 0; i < num_resources; i++)
+        work[i] = avail[i];
+
+    // Safety Algorithm
+    while (count < num_processes)
+    {
+        bool found = false;
+
+        for (int p = 0; p < num_processes; p++)
+        {
+            if (!finish[p])
+            {
+                bool can_allocate = true;
+
+                for (int r = 0; r < num_resources; r++)
+                {
+                    if (need[p][r] > work[r])
+                    {
+                        can_allocate = false;
+                        break;
+                    }
+                }
+
+                if (can_allocate)
+                {
+                    for (int r = 0; r < num_resources; r++)
+                        work[r] += alloc[p][r];
+
+                    safe_seq[count++] = p;
+                    finish[p] = true;
+                    found = true;
+                }
+            }
+        }
+
+        if (!found)
+        {
+            printf("\nSystem is in an UNSAFE state!\n");
+            printf("No safe sequence exists.\n");
+            return 0;
+        }
+    }
+
+    printf("\nSystem is in a SAFE state.\n");
+    printf("Safe Sequence: < ");
+
+    for (int i = 0; i < num_processes; i++)
+    {
+        printf("P%d", safe_seq[i]);
+
+        if (i < num_processes - 1)
+            printf(" -> ");
+    }
+
+    printf(" >\n");
+
+    return 0;
+}

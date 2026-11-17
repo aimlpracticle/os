@@ -1,0 +1,111 @@
+2. How to run it on Ubuntu
+You can use the Ubuntu Terminal. You do not need to install any extra software because Bash is already available on Ubuntu.
+
+
+
+
+
+
+
+
+
+Step 1: Open Terminal
+
+Press Ctrl + Alt + T on your keyboard.
+
+
+
+
+
+
+
+
+
+
+
+
+Step 2: Create the script
+
+Type this command and press Enter:
+nano address_book.sh
+
+
+Paste the complete code above into the editor.
+
+
+
+
+
+
+
+
+
+
+
+
+Step 3: Save the file
+- Press Ctrl + O
+- Press Enter
+- Press Ctrl + X to exit Nano.
+
+
+
+
+
+
+
+
+
+
+
+
+Step 4: Give execution permission
+chmod +x address_book.sh
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Step 5: Run the program
+./address_book.sh
+
+
+The Address Book Menu will appear in the terminal.
+
+
+
+3. Example output
+==============================
+       ADDRESS BOOK MENU
+==============================
+1. Create Address Book
+2. View Address Book
+3. Insert a Record
+4. Delete a Record
+5. Modify a Record
+6. Exit
+==============================
+Enter your choice: 1
+Address Book Created Successfully.
+
+Choose option 3 to insert a record. For example:
+Enter Name: Rahul
+Enter Phone: 9876543210
+Enter Email: rahul@example.com
+Record Inserted Successfully.
+
+
+The program automatically creates address_book.txt in the same directory and stores records like this:
+Rahul|9876543210|rahul@example.com
+
+
+Important: Run option 1 only when you want to create or reset the address book, because it clears existing records.
